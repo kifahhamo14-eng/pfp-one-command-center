@@ -15,7 +15,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 (()=>{'use strict';
-const URL='https://ftwutihfkcjjynsgdnih.supabase.co', KEY='sb_publishable_73gzbTXPOum4_wC_n-7SfA_Rs_SVDbZ';
+const SUPABASE_URL='https://ftwutihfkcjjynsgdnih.supabase.co', KEY='sb_publishable_73gzbTXPOum4_wC_n-7SfA_Rs_SVDbZ';
 const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let client,person=null,logs=[],people=[];
 function message(s){$('authMsg').textContent=s}function notify(s){$('alert').textContent=s;$('alert').classList.remove('hidden')}
@@ -31,7 +31,7 @@ $('empBody').innerHTML=person.role==='super_admin'?'<div class="tablewrap"><tabl
 async function load(){try{const {data:{user}}=await client.auth.getUser();if(!user)throw Error('No active session');let p=await client.from('pfp_employee_profiles').select('*').eq('id',user.id).single();if(p.error)throw p.error;person=p.data;if(person.account_status!=='active')notify('Your account is pending administrator activation. You can view your profile but cannot access protected records yet.');
 const r=await client.from('pfp_employee_activity').select('created_at,action,module,record_ref').order('created_at',{ascending:false}).limit(500);logs=r.error?[]:r.data||[];if(person.role==='super_admin'){let x=await client.from('pfp_employee_profiles').select('*').order('created_at',{ascending:false});people=x.data||[];}else people=[];$('auth').hidden=true;$('app').hidden=false;render()}catch(err){message(err.message||'Unable to load profile');$('auth').hidden=false;$('app').hidden=true}}
 async function init(){if(!window.supabase?.createClient){message('The authentication library did not load. Check internet access.');return}
-client=window.supabase.createClient(URL,KEY,{auth:{detectSessionInUrl:true,autoRefreshToken:true,persistSession:true}});
+client=window.supabase.createClient(SUPABASE_URL,KEY,{auth:{detectSessionInUrl:true,autoRefreshToken:true,persistSession:true}});
 $('login').onclick=async()=>{message('Signing in…');let e=await client.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(e.error)message(e.error.message);else{message('');await load()}};
 $('reset').onclick=async()=>{const email=$('email').value.trim();if(!email){message('Enter your email first.');return}let e=await client.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});message(e.error?e.error.message:'If this account exists, a password reset email will be sent. This requires an approved HTTPS redirect URL.')};
 $('signout').onclick=async()=>{await client.auth.signOut();person=null;logs=[];$('app').hidden=true;$('auth').hidden=false;message('Signed out.')};
