@@ -78,32 +78,7 @@ defs.locations={fields:[['name','Office / location name','text',1],['governorate
 defs.funders={fields:[['name','Business / organization name','text',1],['registration','Business registration ID / reference','text'],['contact','Authorized business contact','text'],['source','Funding source / description','text'],['amount','Contribution amount (ILS)','number',1],['date','Contribution date','date',1],['method','Payment / transfer reference','text'],['purpose','Restricted purpose (if any)','text'],['documentation','Receipt / supporting document reference','text'],['reviewer','Compliance reviewer','text'],['status','Review status','select'],['notes','Legal / compliance notes','textarea']],statuses:['Pending Review','Verified','Rejected','Returned']};
 defs.policytracker={fields:[['name','Project / initiative name','text',1],['sector','Sector / priority','text',1],['proposal','Official proposal reference','text'],['owner','Responsible department','text'],['milestone','Next milestone','date'],['budget','Internal planning budget (ILS)','number'],['status','Internal implementation status','select'],['notes','Research and implementation notes','textarea']],statuses:['Research','Scoping','Under Review','Planned','On Hold','Completed']};
 const blank=()=>({items:Object.fromEntries(Object.keys(defs).map(k=>[k,[]])),history:[],settings:{listName:'Electoral List',electionDate:'',notice:'Set election and compliance deadlines only after verifying official CEC instructions.',voiceTitle:'Campaign Director'}});let db;try{db=JSON.parse(localStorage.getItem(KEY))||blank()}catch{db=blank()}if(!db.items)db=blank();for(const k of Object.keys(defs))db.items[k]??=[];db.history??=[];db.settings??=blank().settings;let page='home',language='en',q='',sort='new',chat=[];const $=id=>document.getElementById(id),el=(tag,props={},children=[])=>{let x=document.createElement(tag);Object.entries(props).forEach(([k,v])=>{if(k==='text')x.textContent=v;else x.setAttribute(k,v)});children.forEach(c=>x.append(c));return x};const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));function save(){try{localStorage.setItem(KEY,JSON.stringify(db));return true}catch(e){alert('Browser storage is full or unavailable. Export a backup and remove unused data. '+e.message);return false}}function log(verb,detail){db.history.unshift({at:new Date().toISOString(),by:$('role').value,verb,detail});db.history=db.history.slice(0,3000)}function pName(k){let s=sections.find(x=>x[0]===k);return language==='ar'?s[3]:s[2]}const t=(en,ar)=>language==='ar'?ar:en;function renderNav(){$('nav').innerHTML=sections.map(([id,icon,en,ar])=>`<button class="${page===id?'active':''}" data-page="${id}" title="${esc(t(en,ar))}"><span>${icon}</span>${esc(t(en,ar))}</button>`).join('');$('nav').querySelectorAll('button').forEach(b=>b.onclick=()=>{page=b.dataset.page;q='';closeNav();render();window.scrollTo(0,0)})}
-function pfpPrint(titleText,inner){const w=window.open('','_blank');if(!w){alert('Allow pop-ups to print this report.');return}w.document.write('<!doctype html><html lang="'+(language==='ar'?'ar':'en')+'" dir="'+(language==='ar'?'rtl':'ltr')+'"><head><meta charset="utf-8"><title>'+esc(titleText)+'</title><style>body{font:14px Arial,sans-serif;color:#14253d;padding:28px}h1{border-bottom:3px solid #b79a5b;padding-bottom:12px}table{border-collapse:collapse;width:100%;margin:16px 0}td,th{border:1px solid #cfd8df;padding:10px;text-align:start;overflow-wrap:anywhere}th{background:#e9edf2}small{color:#59697c}@media print{@page{size:A4;margin:13mm}button{display:none}}</style></head><body><h1>'+esc(titleText)+'</h1><small>'+new Date().toLocaleString()+' • Internal operational assessment • Review before relying on any estimate</small>'+inner+'<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script>
-(async function(){
-const message=document.getElementById('pfpGateMessage');
-const login=document.getElementById('pfpGateSubmit');
-let client;
-const url='https://ftwutihfkcjjynsgdnih.supabase.co';
-const key='sb_publishable_73gzbTXPOum4_wC_n-7SfA_Rs_SVDbZ';
-try{if(!window.supabase?.createClient)throw Error('Authentication library unavailable. Check network.');
-client=window.supabase.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
-async function showAccount(){const u=await client.auth.getUser();if(u.error||!u.data.user)return false;
-const p=await client.from('pfp_employee_profiles').select('role,account_status').eq('id',u.data.user.id).single();
-if(p.error){message.textContent='Profile not available: '+p.error.message;return false}
-if(p.data.role!=='super_admin'||p.data.account_status!=='active'){message.textContent='Your account requires active Super Administrator access to this restored dashboard.';return false}
-document.body.classList.add('pfp-verified');
-try{const code=document.getElementById('pfpOriginalDashboard').textContent;const s=document.createElement('script');s.textContent=code;document.body.appendChild(s);
-const role=document.getElementById('role');if(role){role.value='director';role.disabled=true;role.title='PFP authenticated administrator (legacy demo role selector disabled)'}
-}catch(e){document.body.classList.remove('pfp-verified');message.textContent='Dashboard initialization failed: '+e.message}
-return true}
-login.onclick=async()=>{login.disabled=true;message.textContent='Signing in…';const result=await client.auth.signInWithPassword({email:document.getElementById('pfpGateEmail').value.trim(),password:document.getElementById('pfpGatePassword').value});if(result.error){message.textContent=result.error.message}else{message.textContent='';await showAccount()}login.disabled=false};
-document.getElementById('pfpGateLogout').onclick=async()=>{await client.auth.signOut();message.textContent='Signed out.'};
-document.getElementById('pfpFullLogout').onclick=async()=>{await client.auth.signOut();location.reload()};
-await showAccount();
-}catch(e){message.textContent=e.message}
-})();
-</script></body></html>');w.document.close();w.focus();setTimeout(()=>w.print(),350)}
+function pfpPrint(titleText,inner){const w=window.open('','_blank');if(!w){alert('Allow pop-ups to print this report.');return}w.document.write('<!doctype html><html lang="'+(language==='ar'?'ar':'en')+'" dir="'+(language==='ar'?'rtl':'ltr')+'"><head><meta charset="utf-8"><title>'+esc(titleText)+'</title><style>body{font:14px Arial,sans-serif;color:#14253d;padding:28px}h1{border-bottom:3px solid #b79a5b;padding-bottom:12px}table{border-collapse:collapse;width:100%;margin:16px 0}td,th{border:1px solid #cfd8df;padding:10px;text-align:start;overflow-wrap:anywhere}th{background:#e9edf2}small{color:#59697c}@media print{@page{size:A4;margin:13mm}button{display:none}}</style></head><body><h1>'+esc(titleText)+'</h1><small>'+new Date().toLocaleString()+' • Internal operational assessment • Review before relying on any estimate</small>'+inner+'</body></html>');w.document.close();w.focus();setTimeout(()=>w.print(),350)}
 function locationInsights(){const arr=db.items.locations;let byStatus=defs.locations.statuses.map(t=>[t,arr.filter(x=>x.status===t).length]);let byGovern=[...new Set(arr.map(x=>x.governorate).filter(Boolean))].sort().map(g=>[g,arr.filter(x=>x.governorate===g).length]);let c=el('div',{class:'chartgrid'});c.append(chartPanel(t('Location status','حالة المواقع'),barchart(byStatus)),chartPanel(t('Offices by governorate','المكاتب حسب المحافظة'),barchart(byGovern)));$('app').append(c);
  let riskRows=arr.map(x=>({...x,score:(+x.likelihood||0)*(+x.impact||0)})).sort((a,b)=>b.score-a.score);let pane=el('section',{class:'panel'});pane.innerHTML='<h2>'+t('Location comparison & risk register','مقارنة المواقع وسجل المخاطر')+'</h2><p class="muted">'+t('Compare operational readiness, monthly cost, office capacity, and assessed risk. Scores are human-entered estimates, not automatic security predictions.','قارن الجاهزية والتكلفة والسعة والمخاطر. التقديرات مُدخلة من الموظفين وليست تنبؤات أمنية.')+'</p><div class="scroll"><table><thead><tr>'+['Office','Governorate','Capacity','Cost (ILS/mo)','Risk /25','Status','Report'].map((v,i)=>'<th>'+t(v,['المكتب','المحافظة','السعة','التكلفة (شيكل/شهر)','الخطورة /٢٥','الحالة','التقرير'][i])+'</th>').join('')+'</tr></thead><tbody>'+riskRows.map(x=>'<tr><td>'+esc(x.name)+'</td><td>'+esc(x.governorate||'—')+'</td><td>'+esc(x.capacity||'—')+'</td><td>'+esc(x.monthlyCost||'—')+'</td><td><strong>'+x.score+'/25</strong></td><td>'+esc(x.status||'—')+'</td><td><button class="mini" data-report="'+esc(x.id)+'">'+t('Print','طباعة')+'</button></td></tr>').join('')+'</tbody></table></div>';$('app').append(pane);
  pane.querySelectorAll('[data-report]').forEach(b=>b.onclick=()=>{let x=arr.find(z=>z.id===b.dataset.report);let rows=defs.locations.fields.map(([key,label])=>'<tr><th>'+esc(label)+'</th><td>'+esc(x[key]||'—')+'</td></tr>').join('');pfpPrint('PFP — '+x.name+' — '+t('Location Risk Assessment','تقرير تقييم مخاطر الموقع'),'<h2>'+t('Assessment score','درجة التقييم')+': '+((+x.likelihood||0)*(+x.impact||0))+'/25</h2><table>'+rows+'</table>')});
@@ -453,4 +428,29 @@ home=p7Home;
 
 render();
 
+</script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+(async function(){
+const message=document.getElementById('pfpGateMessage');
+const login=document.getElementById('pfpGateSubmit');
+let client;
+const url='https://ftwutihfkcjjynsgdnih.supabase.co';
+const key='sb_publishable_73gzbTXPOum4_wC_n-7SfA_Rs_SVDbZ';
+try{if(!window.supabase?.createClient)throw Error('Authentication library unavailable. Check network.');
+client=window.supabase.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+async function showAccount(){const u=await client.auth.getUser();if(u.error||!u.data.user)return false;
+const p=await client.from('pfp_employee_profiles').select('role,account_status').eq('id',u.data.user.id).single();
+if(p.error){message.textContent='Profile not available: '+p.error.message;return false}
+if(p.data.role!=='super_admin'||p.data.account_status!=='active'){message.textContent='Your account requires active Super Administrator access to this restored dashboard.';return false}
+document.body.classList.add('pfp-verified');
+try{const code=document.getElementById('pfpOriginalDashboard').textContent;const s=document.createElement('script');s.textContent=code;document.body.appendChild(s);
+const role=document.getElementById('role');if(role){role.value='director';role.disabled=true;role.title='PFP authenticated administrator (legacy demo role selector disabled)'}
+}catch(e){document.body.classList.remove('pfp-verified');message.textContent='Dashboard initialization failed: '+e.message}
+return true}
+login.onclick=async()=>{login.disabled=true;message.textContent='Signing in…';const result=await client.auth.signInWithPassword({email:document.getElementById('pfpGateEmail').value.trim(),password:document.getElementById('pfpGatePassword').value});if(result.error){message.textContent=result.error.message}else{message.textContent='';await showAccount()}login.disabled=false};
+document.getElementById('pfpGateLogout').onclick=async()=>{await client.auth.signOut();message.textContent='Signed out.'};
+document.getElementById('pfpFullLogout').onclick=async()=>{await client.auth.signOut();location.reload()};
+await showAccount();
+}catch(e){message.textContent=e.message}
+})();
 </script></body></html>
