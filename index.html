@@ -455,13 +455,14 @@ let staffProfiles=[],staffLogs=[],activityPending=[];
 const logEvent=(action,module,ref='',details={})=>{
 if(!currentUser||!currentProfile||currentProfile.account_status!=='active')return;
 activityPending.push({actor_id:currentUser.id,action:String(action).slice(0,80),module:String(module).slice(0,80),record_ref:String(ref).slice(0,160),details});
-if(activityPending.length>=15)flushActivity()
+if(activityPending.length>=15)flushActivity();else scheduleFlush()
 };
-let flushing=false;
+let flushing=false,flushTimer=null;
+function scheduleFlush(){if(flushTimer)return;flushTimer=setTimeout(()=>{flushTimer=null;flushActivity()},2200)}
 async function flushActivity(){
 if(flushing||!activityPending.length)return;
 flushing=true;const batch=activityPending.splice(0,30);
-try{const res=await client.from('pfp_employee_activity').insert(batch);if(res.error){console.warn('PFP activity logging failed',res.error.message)}}catch(e){console.warn('PFP activity logging failed',e)}finally{flushing=false}
+try{const res=await client.from('pfp_employee_activity').insert(batch);if(res.error){console.warn('PFP activity logging failed',res.error.message)}}catch(e){console.warn('PFP activity logging failed',e)}finally{flushing=false;if(activityPending.length)scheduleFlush()}
 }
 document.addEventListener('click',ev=>{
 if(!document.body.classList.contains('pfp-authed')&&!document.body.classList.contains('pfp-employee'))return;
