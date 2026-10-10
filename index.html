@@ -1570,4 +1570,48 @@ else{schedule();new MutationObserver(schedule).observe(document.getElementById('
 window.addEventListener('pfp:workspace-change',()=>{if(document.getElementById('pfp-auto-risk-root'))draw()});
 setInterval(()=>{if(document.getElementById('pfp-auto-risk-root'))draw()},60000);
 })();
-</script></body></html>
+</script>
+<style id="pfp-targeted-bulletins-css">
+.pfp-tb-head{display:flex;justify-content:space-between;align-items:center;gap:8px}.pfp-tb-head h3{margin:0!important}.pfp-tb-head button,.pfp-tb-bottom,.pfp-tb-add{border:1px solid #4a83a5;background:#1c5074;color:#fff;border-radius:8px;padding:8px;cursor:pointer}
+.pfp-tb-stats{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}.pfp-tb-stats span{background:#193f5e;color:#e3f5ff;padding:7px;border-radius:20px;font-size:11px}
+.pfp-tb-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:9px}.pfp-tb-column{min-width:0;border:1px solid #375c7d;background:#102945;border-radius:13px;padding:11px}.pfp-tb-title{display:flex;align-items:center;justify-content:space-between;gap:6px;color:white;font-size:13px;font-weight:800}
+.pfp-tb-items{overflow:auto;max-height:355px;margin:10px 0}.pfp-tb-item{display:flex;align-items:start;gap:8px;padding:10px;background:#1b3d5b;border:1px solid #406b8d;border-radius:9px;margin:0 0 8px;color:#fff;min-width:0}.pfp-tb-item.task{border-left:3px solid #5dd8ef}.pfp-tb-item input{height:19px;width:19px;flex:none;accent-color:#65dcaa}.pfp-tb-item>div{flex:1;min-width:0}.pfp-tb-item b{color:#fff;font-size:12px;overflow-wrap:anywhere}.pfp-tb-item small{display:block;margin-top:5px;color:#b6d6e8;font-size:11px}.pfp-tb-item p{font-size:11px;line-height:1.35;color:#c8dfef;margin:6px 0;overflow-wrap:anywhere}.pfp-tb-item button{border:0;background:transparent;color:#88deff;cursor:pointer;padding:5px 0}.pfp-tb-item.notice{display:block}.pfp-tb-item.notice:first-child{border-color:#c3a16b}.pfp-tb-empty{font-size:12px;color:#bfd8e9;padding:12px 0}
+@media(max-width:1150px){.pfp-tb-grid{grid-template-columns:1fr}.pfp-tb-items{max-height:270px}}
+</style>
+<script id="pfp-targeted-bulletins-js">
+/* PFP TARGETED BULLETINS V81 */
+(function(){
+ function mount(){
+  if(typeof page==='undefined'||page!=='home'||typeof db==='undefined')return;
+  const panels=[...document.querySelectorAll('#app .p7x-panel')],panel=panels.find(x=>/Task status snapshot|ملخص حالة المهام/.test(x.querySelector('h3')?.textContent||''));
+  if(!panel||panel.dataset.bulletinMounted)return;
+  panel.dataset.bulletinMounted='1';
+  const tasks=db.items.tasks||[],notes=db.items.announcements||[],pending=tasks.filter(x=>x.status!=='Done'),today=new Date().toISOString().slice(0,10);
+  const esc2=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const go=()=>{page='tasks';q='';render();window.scrollTo(0,0)};
+  panel.innerHTML='<div class="pfp-tb-head"><h3>Task & Announcements Bulletins</h3><button data-tb-go>Full board ↗</button></div><div class="pfp-tb-stats"><span>◷ '+pending.length+' open</span><span>⚠ '+pending.filter(x=>x.due&&x.due<today).length+' overdue</span><span>◎ '+(db.items.approvals||[]).filter(x=>x.status==='Pending').length+' approvals</span></div><div class="pfp-tb-grid"><section class="pfp-tb-column"><div class="pfp-tb-title">☑ To-Do List <button class="pfp-tb-add" data-tb-new>+ Task</button></div><div class="pfp-tb-items">'+(pending.length?pending.slice().sort((a,b)=>String(a.due||'9999').localeCompare(String(b.due||'9999'))).slice(0,12).map(x=>'<article class="pfp-tb-item task"><input type="checkbox" data-tb-check="'+esc2(x.id)+'" aria-label="Complete '+esc2(x.name)+'" '+(!permitted('write','tasks')?'disabled':'')+'><div><b>'+esc2(x.name||'Untitled task')+'</b><small>'+esc2(x.owner||'Unassigned')+' · '+esc2(x.due||'No deadline')+' · '+esc2(x.priority||'Normal')+'</small><p>'+esc2(x.notes||'No instructions yet')+'</p></div><button data-tb-view="'+esc2(x.id)+'">↗</button></article>').join(''):'<p class="pfp-tb-empty">No outstanding tasks.</p>')+'</div><button class="pfp-tb-bottom" data-tb-go>All tasks →</button></section><section class="pfp-tb-column"><div class="pfp-tb-title">◈ Announcements <button class="pfp-tb-add" data-tb-go>+ Post</button></div><div class="pfp-tb-items">'+(notes.length?notes.slice().sort((a,b)=>Number(!!b.pinned)-Number(!!a.pinned)||String(b.createdAt||'').localeCompare(String(a.createdAt||''))).slice(0,8).map(x=>'<article class="pfp-tb-item notice"><b>'+(x.pinned?'📌 ':'')+esc2(x.title||'Notice')+'</b><p>'+esc2(x.body||'')+'</p><small>'+esc2(x.author||'Team')+' · '+esc2(String(x.createdAt||'').slice(0,10))+'</small><button data-tb-ack="'+esc2(x.id)+'">Acknowledge</button></article>').join(''):'<p class="pfp-tb-empty">No announcements posted. Open Tasks to add one.</p>')+'</div><button class="pfp-tb-bottom" data-tb-go>Manage announcements →</button></section></div>';
+  panel.querySelectorAll('[data-tb-go]').forEach(b=>b.onclick=go);
+  panel.querySelector('[data-tb-new]').onclick=()=>openRecord('tasks');
+  panel.querySelectorAll('[data-tb-view]').forEach(b=>b.onclick=()=>openRecord('tasks',b.dataset.tbView));
+  panel.querySelectorAll('[data-tb-check]').forEach(b=>b.onchange=()=>{
+   b.checked=false;
+   const t=(db.items.tasks||[]).find(x=>String(x.id)===b.dataset.tbCheck);
+   if(!t||!permitted('write','tasks')||typeof window.__pfpCommit!=='function')return alert('Shared workspace or edit access unavailable.');
+   if(t.priority==='Urgent'||/approval|required review/i.test(t.notes||'')){alert('Complete important tasks through the Tasks board approval workflow.');go();return}
+   if(!confirm('Mark this task complete: '+t.name+'?'))return;
+   t.status='Done';log('Task status updated',t.name+' → Done');save();render()
+  });
+  panel.querySelectorAll('[data-tb-ack]').forEach(b=>b.onclick=()=>{
+   const n=(db.items.announcements||[]).find(x=>String(x.id)===b.dataset.tbAck);
+   if(!n||typeof window.__pfpCommit!=='function')return alert('Workspace unavailable.');
+   n.acknowledgments??=[];const who=String(window.__pfpCurrentUser?.email||$('role')?.value||'User');
+   if(!n.acknowledgments.includes(who)){n.acknowledgments.push(who);log('Announcement acknowledged',n.title);save()}render()
+  })
+ }
+ window.PFPTaskBulletinMount=mount;
+ const observer=new MutationObserver(()=>{if(typeof page==='undefined'||page!=='home')return;const p=document.querySelector('#app .p7x-panel h3');if(p)mount()});
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{observer.observe(document.getElementById('app'),{childList:true,subtree:true});mount()});
+ else{observer.observe(document.getElementById('app'),{childList:true,subtree:true});mount()}
+})();
+</script>
+</body></html>
