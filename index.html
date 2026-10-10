@@ -722,7 +722,7 @@ p7Elections=p8Render;
 
 const p7OldRender=render;
 render=function(){if(page==='home'||page==='candidates'){document.documentElement.dir=language==='ar'?'rtl':'ltr';$('langBtn').textContent=language==='ar'?'English':'العربية';renderNav();if(page==='home')home();else p7Elections()}else p7OldRender()};
-home=function(){p7Home();const overview=document.querySelector('#app .p7x-mixed'),brain=document.querySelector('#pfpbrain-v47');if(overview&&brain)overview.insertAdjacentElement('afterend',brain);window.__pfpEnsureBrain?.();};
+home=function(){p7Home();const overview=document.querySelector('#app .p7x-mixed'),brain=document.querySelector('#pfpbrain-v47');if(overview&&brain)overview.insertAdjacentElement('afterend',brain);window.__pfpEnsureBrain?.();window.__pfpRefreshCharts?.();};
 
 render();
 
@@ -1183,6 +1183,7 @@ function inspect(kind,recordId=''){const m=metrics(),map={tasks:'tasks',candidat
  else if(kind==='comparison'){let days=m.days;const prev=days.slice(0,7).reduce((a,b)=>a+b,0),curr=days.slice(7).reduce((a,b)=>a+b,0);box.innerHTML='<div class="pfpv-inspector-row"><b>Previous seven days (local history)</b><strong>'+prev+'</strong></div><div class="pfpv-inspector-row"><b>Recent seven days (local history)</b><strong>'+curr+'</strong></div><p>Meaningful outcomes must be measured separately from interface activity. No prediction is used here.</p>'}
  else{box.innerHTML='<div class="pfpv-inspector-row"><b>Total source records</b><strong>'+list.length+'</strong></div>'+(list.slice(0,30).map(x=>'<div class="pfpv-inspector-row"><div><b>'+esc(x.name||x.title||'Record')+'</b><small style="display:block">'+esc(x.status||x.department||'No status')+'</small></div><button data-pfpv-record="'+esc(x.id||'')+'">View ↗</button></div>').join('')||'<p>No related records are stored for this section.</p>')}
  wrapper.onclick=e=>{if(e.target===wrapper||e.target.closest('[data-vclose]'))wrapper.remove();const p=e.target.closest('[data-pfpv-person]');if(p){wrapper.remove();inspect('person',p.dataset.pfpvPerson)}const rec=e.target.closest('[data-pfpv-record]');if(rec&&key&&typeof viewRec==='function'){wrapper.remove();try{viewRec(key,rec.dataset.pfpvRecord)}catch{}}};document.body.append(wrapper)}
+window.__pfpRefreshCharts=function(){try{const root=q('#pfpv-command');if(root){paint();applyMotion()}}catch(e){console.warn('PFP chart refresh:',e)}};
 function update(){const root=q('#pfpv-command');if(!q('#app'))return;if(!root){layer();return}const m=metrics(),counts=[m.tasks.length,m.openTask,m.cands.length,m.verified,m.high,m.pending,m.team.length,m.history.length,count('finance')].join(',');if(lastCounts!==null&&counts!==lastCounts){root.classList.add('pfpv-glow');setTimeout(()=>root.classList.remove('pfpv-glow'),1300);paint()}lastCounts=counts}
 function tick(){if(scheduled)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;observer?.disconnect();try{update()}finally{observer?.observe(document.body,{childList:true,subtree:true})}})}
 observer=new MutationObserver(tick);observer.observe(document.body,{childList:true,subtree:true});if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',tick);else tick();
@@ -1209,4 +1210,10 @@ document.addEventListener('click',e=>{const b=e.target.closest?.('[data-brain47]
 document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches?.('[data-brain47]')){e.preventDefault();openNode(e.target.dataset.brain47)}},true);
 let ob,queued=false;function tick(){if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;ob.disconnect();try{add()}finally{ob.observe(document.body,{childList:true,subtree:true})}})}
 ob=new MutationObserver(tick);ob.observe(document.body,{childList:true,subtree:true});if(document.readyState!=='loading')tick();else document.addEventListener('DOMContentLoaded',tick);
+})();</script><script id="pfp-visual-repair-v53">(function(){
+'use strict';
+function stripStrayStyles(){const host=document.querySelector('#app');if(!host)return;const walker=document.createTreeWalker(host,NodeFilter.SHOW_TEXT);const bad=[];while(walker.nextNode()){const node=walker.currentNode,container=node.parentElement;if(!container||['STYLE','SCRIPT','NOSCRIPT'].includes(container.tagName))continue;const content=(node.nodeValue||'').trim();if(content.startsWith('#app .brain47{')&&content.includes('@keyframes brain47Pulse'))bad.push(node)}bad.forEach(node=>node.remove())}
+function refresh(){stripStrayStyles();if(typeof window.__pfpRefreshCharts==='function')window.__pfpRefreshCharts()}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',refresh);else refresh();
+document.addEventListener('click',e=>{if(e.target.closest?.('[data-p7goto="home"],[data-goto="home"],[data-page="home"]'))requestAnimationFrame(refresh)},true);
 })();</script></body></html>
