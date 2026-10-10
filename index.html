@@ -324,29 +324,7 @@ defs.locations={fields:[['name','Office / location name','text',1],['governorate
 defs.funders={fields:[['name','Business / organization name','text',1],['registration','Business registration ID / reference','text'],['contact','Authorized business contact','text'],['source','Funding source / description','text'],['amount','Contribution amount (ILS)','number',1],['date','Contribution date','date',1],['method','Payment / transfer reference','text'],['purpose','Restricted purpose (if any)','text'],['documentation','Receipt / supporting document reference','text'],['reviewer','Compliance reviewer','text'],['status','Review status','select'],['notes','Legal / compliance notes','textarea']],statuses:['Pending Review','Verified','Rejected','Returned']};
 defs.policytracker={fields:[['name','Project / initiative name','text',1],['sector','Sector / priority','text',1],['proposal','Official proposal reference','text'],['owner','Responsible department','text'],['milestone','Next milestone','date'],['budget','Internal planning budget (ILS)','number'],['status','Internal implementation status','select'],['notes','Research and implementation notes','textarea']],statuses:['Research','Scoping','Under Review','Planned','On Hold','Completed']};
 const blank=()=>({items:Object.fromEntries(Object.keys(defs).map(k=>[k,[]])),history:[],settings:{listName:'Electoral List',electionDate:'',notice:'Set election and compliance deadlines only after verifying official CEC instructions.',voiceTitle:'Campaign Director'}});let db=(window.__pfpSharedData&&window.__pfpSharedData.items)?window.__pfpSharedData:blank();if(!db.items)db=blank();for(const k of Object.keys(defs))db.items[k]??=[];db.history??=[];db.settings??=blank().settings;let page='home',language='en',q='',sort='new',chat=[];const $=id=>document.getElementById(id),el=(tag,props={},children=[])=>{let x=document.createElement(tag);Object.entries(props).forEach(([k,v])=>{if(k==='text')x.textContent=v;else x.setAttribute(k,v)});children.forEach(c=>x.append(c));return x};const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));function save(){if(typeof window.__pfpCommit==='function'){window.__pfpCommit(db);return true}alert('Shared workspace is not connected. Changes were not saved.');return false}function log(verb,detail){db.history.unshift({at:new Date().toISOString(),by:$('role').value,verb,detail});db.history=db.history.slice(0,3000)}function pName(k){let s=sections.find(x=>x[0]===k);return language==='ar'?s[3]:s[2]}const t=(en,ar)=>language==='ar'?ar:en;function renderNav(){$('nav').innerHTML=sections.map(([id,icon,en,ar])=>`<button class="${page===id?'active':''}" data-page="${id}" title="${esc(t(en,ar))}"><span>${icon}</span>${esc(t(en,ar))}</button>`).join('');$('nav').querySelectorAll('button').forEach(b=>b.onclick=()=>{page=b.dataset.page;q='';closeNav();render();window.scrollTo(0,0)})}
-function pfpPrint(titleText,inner){const w=window.open('','_blank');if(!w){alert('Allow pop-ups to print this report.');return}w.document.write('<!doctype html><html lang="'+(language==='ar'?'ar':'en')+'" dir="'+(language==='ar'?'rtl':'ltr')+'"><head><meta charset="utf-8"><title>'+esc(titleText)+'</title><style>body{font:14px Arial,sans-serif;color:#14253d;padding:28px}h1{border-bottom:3px solid #b79a5b;padding-bottom:12px}table{border-collapse:collapse;width:100%;margin:16px 0}td,th{border:1px solid #cfd8df;padding:10px;text-align:start;overflow-wrap:anywhere}th{background:#e9edf2}small{color:#59697c}@media print{@page{size:A4;margin:13mm}button{display:none}}</style></head><body><h1>'+esc(titleText)+'</h1><small>'+new Date().toLocaleString()+' • Internal operational assessment • Review before relying on any estimate</small>'+inner+'<script id="pfp-stray-css-cleaner-v56">(function(){'use strict';
-function clean(){
- const app=document.getElementById('app');if(!app)return;
- const walker=document.createTreeWalker(app,NodeFilter.SHOW_TEXT);
- const targets=[];while(walker.nextNode()){const n=walker.currentNode,p=n.parentElement;if(!p||p.closest('style,script,textarea,pre,code'))continue;
- const v=(n.nodeValue||'').trim();
- if(v.startsWith('#app .brain47{')&&v.includes('.brain47-grid')&&v.length>300)targets.push(n);
- }
- targets.forEach(n=>n.remove());
-}
-let pending=false;function queue(){if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;clean()})}
-const observer=new MutationObserver(queue);
-function start(){clean();const app=document.getElementById('app');if(app)observer.observe(app,{childList:true,subtree:true,characterData:true})}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
-})();</script><script id="pfp-home-order-v57">(function(){'use strict';
-let active=false;
-function arrange(){const app=document.getElementById('app');if(!app)return;const title=app.querySelector('.p7-top'),overview=app.querySelector('.p7x-mixed');if(!title||!overview)return;
-if(app.firstElementChild!==title)app.prepend(title);
-if(title.nextElementSibling!==overview)title.insertAdjacentElement('afterend',overview);
-}
-function start(){const app=document.getElementById('app');if(!app)return;const observer=new MutationObserver(()=>{if(active)return;active=true;observer.disconnect();try{arrange()}finally{observer.observe(app,{childList:true,subtree:true});active=false}});arrange();observer.observe(app,{childList:true,subtree:true})}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
-})();</script></body></html>');w.document.close();w.focus();setTimeout(()=>w.print(),350)}
+function pfpPrint(titleText,inner){const w=window.open('','_blank');if(!w){alert('Allow pop-ups to print this report.');return}w.document.write('<!doctype html><html lang="'+(language==='ar'?'ar':'en')+'" dir="'+(language==='ar'?'rtl':'ltr')+'"><head><meta charset="utf-8"><title>'+esc(titleText)+'</title><style>body{font:14px Arial,sans-serif;color:#14253d;padding:28px}h1{border-bottom:3px solid #b79a5b;padding-bottom:12px}table{border-collapse:collapse;width:100%;margin:16px 0}td,th{border:1px solid #cfd8df;padding:10px;text-align:start;overflow-wrap:anywhere}th{background:#e9edf2}small{color:#59697c}@media print{@page{size:A4;margin:13mm}button{display:none}}</style></head><body><h1>'+esc(titleText)+'</h1><small>'+new Date().toLocaleString()+' • Internal operational assessment • Review before relying on any estimate</small>'+inner+'</body></html>');w.document.close();w.focus();setTimeout(()=>w.print(),350)}
 function locationInsights(){const arr=db.items.locations;let byStatus=defs.locations.statuses.map(t=>[t,arr.filter(x=>x.status===t).length]);let byGovern=[...new Set(arr.map(x=>x.governorate).filter(Boolean))].sort().map(g=>[g,arr.filter(x=>x.governorate===g).length]);let c=el('div',{class:'chartgrid'});c.append(chartPanel(t('Location status','حالة المواقع'),barchart(byStatus)),chartPanel(t('Offices by governorate','المكاتب حسب المحافظة'),barchart(byGovern)));$('app').append(c);
  let riskRows=arr.map(x=>({...x,score:(+x.likelihood||0)*(+x.impact||0)})).sort((a,b)=>b.score-a.score);let pane=el('section',{class:'panel'});pane.innerHTML='<h2>'+t('Location comparison & risk register','مقارنة المواقع وسجل المخاطر')+'</h2><p class="muted">'+t('Compare operational readiness, monthly cost, office capacity, and assessed risk. Scores are human-entered estimates, not automatic security predictions.','قارن الجاهزية والتكلفة والسعة والمخاطر. التقديرات مُدخلة من الموظفين وليست تنبؤات أمنية.')+'</p><div class="scroll"><table><thead><tr>'+['Office','Governorate','Capacity','Cost (ILS/mo)','Risk /25','Status','Report'].map((v,i)=>'<th>'+t(v,['المكتب','المحافظة','السعة','التكلفة (شيكل/شهر)','الخطورة /٢٥','الحالة','التقرير'][i])+'</th>').join('')+'</tr></thead><tbody>'+riskRows.map(x=>'<tr><td>'+esc(x.name)+'</td><td>'+esc(x.governorate||'—')+'</td><td>'+esc(x.capacity||'—')+'</td><td>'+esc(x.monthlyCost||'—')+'</td><td><strong>'+x.score+'/25</strong></td><td>'+esc(x.status||'—')+'</td><td><button class="mini" data-report="'+esc(x.id)+'">'+t('Print','طباعة')+'</button></td></tr>').join('')+'</tbody></table></div>';$('app').append(pane);
  pane.querySelectorAll('[data-report]').forEach(b=>b.onclick=()=>{let x=arr.find(z=>z.id===b.dataset.report);let rows=defs.locations.fields.map(([key,label])=>'<tr><th>'+esc(label)+'</th><td>'+esc(x[key]||'—')+'</td></tr>').join('');pfpPrint('PFP — '+x.name+' — '+t('Location Risk Assessment','تقرير تقييم مخاطر الموقع'),'<h2>'+t('Assessment score','درجة التقييم')+': '+((+x.likelihood||0)*(+x.impact||0))+'/25</h2><table>'+rows+'</table>')});
@@ -1324,4 +1302,26 @@ function upgrade(){
 let queued=false;const observer=new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;upgrade()})});
 function init(){const root=document.getElementById('pfpv-grid');if(!root){setTimeout(init,600);return}observer.observe(root,{childList:true,subtree:false});upgrade();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();</script><script id="pfp-stray-css-cleaner-v56">(function(){'use strict';
+function clean(){
+ const app=document.getElementById('app');if(!app)return;
+ const walker=document.createTreeWalker(app,NodeFilter.SHOW_TEXT);
+ const targets=[];while(walker.nextNode()){const n=walker.currentNode,p=n.parentElement;if(!p||p.closest('style,script,textarea,pre,code'))continue;
+ const v=(n.nodeValue||'').trim();
+ if(v.startsWith('#app .brain47{')&&v.includes('.brain47-grid')&&v.length>300)targets.push(n);
+ }
+ targets.forEach(n=>n.remove());
+}
+let pending=false;function queue(){if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;clean()})}
+const observer=new MutationObserver(queue);
+function start(){clean();const app=document.getElementById('app');if(app)observer.observe(app,{childList:true,subtree:true,characterData:true})}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+})();</script><script id="pfp-home-order-v57">(function(){'use strict';
+let active=false;
+function arrange(){const app=document.getElementById('app');if(!app)return;const title=app.querySelector('.p7-top'),overview=app.querySelector('.p7x-mixed');if(!title||!overview)return;
+if(app.firstElementChild!==title)app.prepend(title);
+if(title.nextElementSibling!==overview)title.insertAdjacentElement('afterend',overview);
+}
+function start(){const app=document.getElementById('app');if(!app)return;const observer=new MutationObserver(()=>{if(active)return;active=true;observer.disconnect();try{arrange()}finally{observer.observe(app,{childList:true,subtree:true});active=false}});arrange();observer.observe(app,{childList:true,subtree:true})}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();</script></body></html>
