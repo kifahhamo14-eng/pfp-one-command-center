@@ -640,7 +640,7 @@ function p7Home(){
  const approvals=p7Data('approvals'),policies=p7Data('policytracker');
  const verified=cs.filter(x=>x.status==='Verified').length, high=risks.filter(x=>x.status!=='Resolved'&&p7Num(x.likelihood)*p7Num(x.impact)>=15).length, spent=finance.reduce((s,x)=>s+p7Num(x.amount),0);
  const overdue=tasks.filter(x=>x.due&&x.due<new Date().toISOString().slice(0,10)&&x.status!=='Done').length;
- const titles=t('PFP ONE · NATIONAL OPERATIONS INTELLIGENCE','التحليلات الوطنية — فلسطين المستقبل');
+ const titles=t('Palestine Future PFP Command Center','التحليلات الوطنية — فلسطين المستقبل');
  const historyAll=p7SeriesFromHistory(10);
  const historyTasks=p7SeriesFromHistory(10,h=>/tasks?/i.test((h.detail||'')+' '+(h.verb||'')));
  const historyResearch=p7SeriesFromHistory(10,h=>/(research|media|opportunit|contacts?)/i.test((h.detail||'')+' '+(h.verb||'')));
