@@ -1417,4 +1417,86 @@ new MutationObserver(summary).observe(el('pfpStaffRows'),{childList:true,subtree
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();</script>
 
-</body></html>
+
+<style id="pfp-auto-risk-style">
+.pfp-auto-risk{margin:16px 0 24px;padding:18px;border:1px solid #4b8cbe;border-radius:17px;background:linear-gradient(145deg,#0d2741,#133b58);color:#eaf7ff;box-shadow:0 14px 35px #122b4740}
+.pfp-auto-risk *{box-sizing:border-box}.pfp-auto-risk h2{color:#fff;font-size:23px;margin:0 0 5px}.pfp-auto-risk p{color:#b7d5e9;margin:7px 0}.pfp-risk-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.pfp-risk-controls{display:flex;flex-wrap:wrap;gap:8px;margin:13px 0}.pfp-risk-controls button,.pfp-risk-action{border:1px solid #58bbef;background:#184b70;border-radius:9px;padding:9px 12px;color:white;cursor:pointer;font-weight:700;min-height:40px}
+.pfp-risk-counts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:13px 0}.pfp-risk-counts div{background:#092039;border:1px solid #2a648d;border-radius:10px;padding:11px}.pfp-risk-counts strong{display:block;font-size:24px;color:#fff}.pfp-risk-counts small{color:#9ccce8}
+.pfp-risk-list{display:grid;gap:11px}.pfp-risk-item{background:#0b2137;border:1px solid #3c688a;border-radius:12px;padding:14px}.pfp-risk-item h3{margin:0;color:#fff;font-size:15px}.pfp-risk-item .pfp-risk-pill{display:inline-block;margin-top:6px;border-radius:20px;padding:4px 9px;font-size:11px;font-weight:800;background:#463334;color:#ffd7d2}.pfp-risk-item p{font-size:13px;line-height:1.45;margin:7px 0}.pfp-risk-item b{color:#fff}.pfp-risk-meta{color:#9cd6fa;font-size:12px}.pfp-risk-item .pfp-risk-action{margin-top:9px}
+@media(max-width:650px){.pfp-auto-risk{padding:13px}.pfp-risk-counts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+<script id="pfp-auto-risk-controller">
+/* PFP AUTO RISK INTELLIGENCE V75 */
+(function(){
+if(window.PFPAutoRisk)return;
+const escapeHTML=x=>String(x??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+const items=k=>Array.isArray(db?.items?.[k])?db.items[k]:[];
+const active=x=>!/done|completed|approved|resolved|rejected|cancelled|verified/i.test(String(x.status||''));
+const dateOf=x=>String(x||'').slice(0,10);
+const daysUntil=d=>{const x=Date.parse(dateOf(d)+'T23:59:59');return Number.isFinite(x)?Math.ceil((x-Date.now())/86400000):null};
+const label=x=>String(x.name||x.title||x.id||'Untitled record');
+function evaluate(){
+ const found=[],seen=new Set();
+ function add(key,priority,title,why,missing,next,source,ref,owner,deadline){
+  if(seen.has(key))return;seen.add(key);found.push({key,priority,title,why,missing,next,source,ref,owner,deadline});
+ }
+ for(const x of items('tasks')){
+  if(!active(x))continue;
+  const d=daysUntil(x.due);
+  if(d!==null&&d<0)add('task-overdue:'+x.id,'Critical','Overdue task: '+label(x),'Due date passed '+Math.abs(d)+' day(s) ago and the task remains '+(x.status||'open')+'.','Updated progress, completion evidence, or revised due date.','Contact the owner, verify the delay, and agree on a revised completion date.','tasks',x.id,x.owner,x.due);
+  else if(d!==null&&d<=3)add('task-soon:'+x.id,'High','Task due soon: '+label(x),'Deadline is '+(d===0?'today':d+' day(s) away')+'.','Progress confirmation and delivery readiness.','Request a status update and confirm the task can be finished on time.','tasks',x.id,x.owner,x.due);
+  else if(String(x.status).toLowerCase()==='blocked')add('task-blocked:'+x.id,'High','Blocked task: '+label(x),'Task status is Blocked.','Blocking dependency and resolution owner.','Identify the blocker and assign a resolution step.','tasks',x.id,x.owner,x.due);
+  if(!String(x.owner||'').trim())add('task-owner:'+x.id,'Medium','Unassigned task: '+label(x),'This active task has no responsible person.','Task owner.','Assign an accountable owner and confirm responsibility.','tasks',x.id,'',x.due);
+ }
+ for(const x of items('approvals')){
+  if(!active(x))continue;
+  const d=daysUntil(x.due);
+  if(d!==null&&d<0)add('approval:'+x.id,'Critical','Approval overdue: '+label(x),'Decision deadline has passed.','Approver decision and supporting reference.','Escalate the request for review and record the decision.','approvals',x.id,x.owner,x.due);
+  else if(d!==null&&d<=3)add('approval:'+x.id,'High','Approval requires attention: '+label(x),'Decision deadline is approaching.','Confirmation from authorized approver.','Prepare supporting documents and request an approval decision.','approvals',x.id,x.owner,x.due);
+ }
+ for(const x of items('risks')){
+  if(!active(x))continue;
+  const score=Number(x.likelihood)*Number(x.impact),p=score>=15?'Critical':score>=8?'High':'Medium';
+  add('registered-risk:'+x.id,p,'Registered risk: '+label(x),'Recorded likelihood × impact is '+(Number.isFinite(score)?score:'not fully specified')+'.',!x.mitigation?'A mitigation / contingency plan.':'Confirmation that mitigation is progressing.','Review the risk and update the mitigation plan and owner.','risks',x.id,x.owner,x.due);
+ }
+ for(const x of items('electioncycles')){
+  const names=[['nominationOpen','Nomination opening'],['nominationClose','Nomination closing'],['polling','Voting day'],['campaignStart','Campaign start'],['campaignEnd','Campaign end']];
+  for(const [field,description] of names){
+   const d=daysUntil(x[field]);if(d===null||d<0||d>14)continue;
+   add('cycle:'+x.id+':'+field,d<=3?'High':'Medium',description+': '+label(x),'Election milestone is in '+d+' day(s).','Readiness confirmation and official timetable verification.','Check preparations against the official election timetable and assign outstanding actions.','electioncycles',x.id,'',x[field]);
+  }
+ }
+ return found.sort((a,b)=>({Critical:0,High:1,Medium:2}[a.priority]-{Critical:0,High:1,Medium:2}[b.priority])).slice(0,150);
+}
+let filter='All',lastSignature='',running=false;
+function draw(){
+ const root=document.getElementById('pfp-auto-risk-root');if(!root)return;
+ const findings=evaluate(),list=filter==='All'?findings:findings.filter(x=>x.priority===filter),count=x=>findings.filter(v=>v.priority===x).length;
+ root.innerHTML='<div class="pfp-risk-head"><div><h2>◉ Automated Risk Intelligence</h2><p>Checks actual tasks, approvals, registered risks and election deadlines. Recommendations require your approval.</p></div><span class="pfp-risk-meta">Updated '+escapeHTML(new Date().toLocaleTimeString())+'</span></div><div class="pfp-risk-counts">'+[['Critical',count('Critical')],['High',count('High')],['Medium',count('Medium')],['Total',findings.length]].map(([k,v])=>'<div><strong>'+v+'</strong><small>'+k+'</small></div>').join('')+'</div><div class="pfp-risk-controls">'+['All','Critical','High','Medium'].map(x=>'<button type="button" data-filter="'+x+'" aria-pressed="'+(filter===x)+'">'+x+'</button>').join('')+'<button type="button" data-risk-refresh="1">Recheck now ↻</button></div><div class="pfp-risk-list">'+(list.length?list.map(x=>'<article class="pfp-risk-item"><h3>'+escapeHTML(x.title)+'</h3><span class="pfp-risk-pill">'+x.priority+'</span><p><b>Why:</b> '+escapeHTML(x.why)+'</p><p><b>Information needed:</b> '+escapeHTML(x.missing)+'</p><p><b>Next work:</b> '+escapeHTML(x.next)+'</p><div class="pfp-risk-meta">Source: '+escapeHTML(x.source)+' · Responsible: '+escapeHTML(x.owner||'Not assigned')+' · Deadline: '+escapeHTML(x.deadline||'Not set')+'</div><button type="button" class="pfp-risk-action" data-risk-create="'+escapeHTML(x.key)+'">Create follow-up task (approve)</button></article>').join(''):'<p>No matching risk indicators found in current records. This does not guarantee zero risk.</p>')+'</div>';
+ root.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{filter=b.dataset.filter;draw()});
+ root.querySelector('[data-risk-refresh]').onclick=draw;
+ root.querySelectorAll('[data-risk-create]').forEach(b=>b.onclick=()=>{
+  const x=findings.find(v=>v.key===b.dataset.riskCreate);if(!x)return;
+  if(typeof permitted==='function'&&!permitted('write','tasks'))return alert('Your role cannot create tasks.');
+  const name='Risk follow-up: '+x.title;
+  if(items('tasks').some(t=>t.name===name&&active(t)))return alert('An open follow-up task already exists for this finding.');
+  if(!confirm('Create a follow-up task?\n\n'+name+'\n\n'+x.next))return;
+  if(typeof window.__pfpCommit!=='function')return alert('Shared workspace is not connected. Task was not created.');
+  const task={id:'riskfollow-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),name,owner:x.owner||'',due:x.deadline&&daysUntil(x.deadline)>=0?dateOf(x.deadline):'',status:'To Do',priority:x.priority==='Critical'?'Urgent':x.priority==='High'?'High':'Normal',notes:'Source: '+x.source+' / '+(x.ref||'')+'\nEvidence: '+x.why+'\nMissing: '+x.missing+'\nRecommended: '+x.next};
+  items('tasks').push(task);log('Created','Approved risk follow-up: '+name);save();draw();alert('Task saved. Open Tasks to assign or update it.');
+ });
+}
+function mount(){
+ if(typeof page==='undefined'||page!=='risks')return;
+ const app=document.getElementById('app');if(!app||document.getElementById('pfp-auto-risk-root'))return;
+ const div=document.createElement('section');div.id='pfp-auto-risk-root';div.className='pfp-auto-risk';app.prepend(div);draw();
+}
+let pending=false;function schedule(){if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;mount()})}
+window.PFPAutoRisk={evaluate,refresh:draw};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{schedule();new MutationObserver(schedule).observe(document.getElementById('app'),{childList:true})});
+else{schedule();new MutationObserver(schedule).observe(document.getElementById('app'),{childList:true})}
+window.addEventListener('pfp:workspace-change',()=>{if(document.getElementById('pfp-auto-risk-root'))draw()});
+setInterval(()=>{if(document.getElementById('pfp-auto-risk-root'))draw()},60000);
+})();
+</script></body></html>
