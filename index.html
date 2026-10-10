@@ -1415,35 +1415,5 @@ el('pfpscRefresh').onclick=()=>{el('pfpStaffReload')?.click();setTimeout(summary
 new MutationObserver(summary).observe(el('pfpStaffRows'),{childList:true,subtree:true});new MutationObserver(summary).observe(el('pfpLogRows'),{childList:true,subtree:true});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
-})();</script><!-- PFP ELECTRIC CIRCUIT EDGES v70: visual-only, no changes to forms or data -->
-<style>
-@property --pfp-current{syntax:"<angle>";inherits:false;initial-value:0deg}
-@keyframes pfp-current-flow{to{--pfp-current:360deg}}
-@keyframes pfp-current-breathe{0%,100%{opacity:.85}50%{opacity:1}}
-.pfp-electric-edge{position:relative!important;isolation:isolate}
-.pfp-electric-edge>.pfp-energy-streak{position:absolute!important;inset:0!important;display:block!important;border-radius:inherit!important;pointer-events:none!important;z-index:10!important;box-sizing:border-box!important;background:conic-gradient(from var(--pfp-current),transparent 0deg,transparent 194deg,#00c9ff 217deg,#e5ffff 227deg,#00caff 238deg,transparent 262deg,transparent 280deg,#00a5ff 305deg,#e1ffff 315deg,#15bfff 325deg,transparent 345deg,transparent 360deg)!important;padding:2px!important;-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0)!important;-webkit-mask-composite:xor!important;mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0)!important;mask-composite:exclude!important;animation:pfp-current-flow 2.5s linear infinite,pfp-current-breathe 1.5s ease-in-out infinite!important;will-change:auto}
-.pfp-electric-edge>.pfp-energy-halo{position:absolute!important;inset:-2px!important;display:block!important;border-radius:inherit!important;pointer-events:none!important;z-index:9!important;box-sizing:border-box!important;background:conic-gradient(from var(--pfp-current),transparent 0deg,transparent 195deg,#19aeff 222deg,#80f5ff 232deg,transparent 268deg,transparent 287deg,#17b6ff 311deg,#91f4ff 321deg,transparent 354deg)!important;padding:4px!important;-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0)!important;-webkit-mask-composite:xor!important;mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0)!important;mask-composite:exclude!important;filter:drop-shadow(0 0 7px #18c9ff) drop-shadow(0 0 12px #008dff)!important;opacity:.95!important;animation:pfp-current-flow 2.5s linear infinite!important}
-.pfp-electric-edge.pfp-electric-button>.pfp-energy-streak{padding:2px!important;animation-duration:1.8s,1.5s!important}
-.pfp-electric-edge.pfp-electric-button>.pfp-energy-halo{padding:3px!important;animation-duration:1.8s!important}
-@media(prefers-reduced-motion:reduce){.pfp-electric-edge>.pfp-energy-streak,.pfp-electric-edge>.pfp-energy-halo{animation-duration:8s!important}}
-</style>
-<script>
-(function(){
- const selectors='.card,.panel,.one-panel,.one-metric,.one-stat,.one-tile,.focus-tile,.viz-panel,.p8-card,.p8-box,.profile-card,.profile-metric,.executive-row,.focus-card,.metric-card,.stat-card,.btn,button:not(.menu-toggle),.one-quick-actions button';
- let queued=false;
- function decorate(){
-  queued=false;
-  document.querySelectorAll(selectors).forEach(el=>{
-   if(el.closest('svg,nav')||el.classList.contains('pfp-electric-edge')||el.closest('.pfp-energy-streak,.pfp-energy-halo'))return;
-   if(el.getBoundingClientRect().width<24||el.getBoundingClientRect().height<20)return;
-   el.classList.add('pfp-electric-edge');
-   if(el.matches('button,.btn'))el.classList.add('pfp-electric-button');
-   for(const name of ['pfp-energy-halo','pfp-energy-streak']){const ring=document.createElement('span');ring.className=name;ring.setAttribute('aria-hidden','true');el.appendChild(ring)}
-  });
- }
- function schedule(){if(!queued){queued=true;requestAnimationFrame(decorate)}}
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{schedule();new MutationObserver(schedule).observe(document.body,{childList:true,subtree:true})});
- else{schedule();new MutationObserver(schedule).observe(document.body,{childList:true,subtree:true})}
-})();
-</script>
+})();</script>
 </body></html>
