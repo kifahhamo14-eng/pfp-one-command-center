@@ -731,7 +731,7 @@ function pfpSocPopup(title,description,renderBody){
  const old=document.querySelector('.pfpsoc-modal-back');if(old)old.remove();
  const back=document.createElement('div');back.className='pfpsoc-modal-back';back.innerHTML='<div class="pfpsoc-modal" role="dialog" aria-modal="true"><div class="pfpsoc-modal-title"><div><small>PFP ONE / INTELLIGENCE DETAIL</small><h2>'+safe(title)+'</h2><p>'+safe(description)+'</p></div><button type="button" class="pfpsoc-modal-close">✕ Close</button></div><div class="pfpsoc-modal-content"></div></div>';
  back.querySelector('.pfpsoc-modal-content').innerHTML=renderBody;
- const close=()=>back.remove();back.querySelector('.pfpsoc-modal-close').onclick=close;back.onclick=e=>{if(e.target===back)close()};document.body.append(back);
+ const close=()=>back.remove();back.querySelector('.pfpsoc-modal-close').onclick=close;back.onclick=e=>{if(e.target===back)close()};$staff('pfpStaffPanel').append(back);
  back.querySelectorAll('[data-int-profile]').forEach(b=>b.onclick=()=>{const id=b.dataset.intProfile;close();editStaff(id)});
  back.querySelectorAll('[data-int-approvals]').forEach(b=>b.onclick=()=>{close();document.getElementById('pfpStaffRows')?.scrollIntoView({behavior:'smooth'})});
  back.querySelectorAll('[data-int-audit]').forEach(b=>b.onclick=()=>{close();document.getElementById('pfpLogRows')?.scrollIntoView({behavior:'smooth'})});
