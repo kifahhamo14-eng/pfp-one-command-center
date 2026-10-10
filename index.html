@@ -805,6 +805,26 @@ const p7OldRender=render;
 render=function(){if(page==='home'||page==='candidates'){document.documentElement.dir=language==='ar'?'rtl':'ltr';$('langBtn').textContent=language==='ar'?'English':'العربية';renderNav();if(page==='home')home();else p7Elections()}else p7OldRender()};
 home=function(){p7Home();const overview=document.querySelector('#app .p7x-mixed'),brain=document.querySelector('#pfpbrain-v47');if(overview&&brain)overview.insertAdjacentElement('afterend',brain);window.__pfpEnsureBrain?.();window.__pfpRefreshCharts?.();};
 
+
+/* Workspace-wide graph invalidation: all page charts use the current source records. */
+let pfpChartsPending=false,pfpChartsTimer=null;
+function pfpAllGraphsRefresh(){
+ if(!document.body.classList.contains('pfp-authed'))return;
+ if(document.querySelector('#modalRoot .modalwrap') || document.querySelector('.pfpv-inspector') || document.activeElement?.matches('input,textarea,select,[contenteditable="true"]')){
+   pfpChartsPending=true;return;
+ }
+ pfpChartsPending=false;
+ const app=document.getElementById('app'),y=window.scrollY;
+ if(!app)return;
+ try{render();window.__pfpRefreshCharts?.();requestAnimationFrame(()=>window.scrollTo(0,y))}
+ catch(error){console.error('PFP dashboard graph refresh failed:',error)}
+}
+function pfpQueueGraphRefresh(){pfpChartsPending=true;clearTimeout(pfpChartsTimer);pfpChartsTimer=setTimeout(pfpAllGraphsRefresh,320)}
+window.addEventListener('pfp:workspace-change',pfpQueueGraphRefresh);
+window.addEventListener('pfp:workspace-saved',pfpQueueGraphRefresh);
+setInterval(()=>{if(pfpChartsPending)pfpAllGraphsRefresh()},1200);
+window.__pfpRefreshAllDashboardGraphs=pfpQueueGraphRefresh;
+
 render();
 
 </script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script><script id="pfp-auth-controller">
@@ -828,7 +848,7 @@ cloudSaving=true;
 const payload=cloudQueued;cloudQueued=null;
 try{const result=await client.rpc('pfp_save_workspace',{p_revision:cloudRevision,p_data:payload});
 if(result.error)throw result.error;
-cloudRevision=Number(result.data);cloudBanner('PFP ONE shared workspace · Cloud saved · Revision '+cloudRevision+'. ');
+cloudRevision=Number(result.data);cloudBanner('PFP ONE shared workspace · Cloud saved · Revision '+cloudRevision+'. ');window.dispatchEvent(new Event('pfp:workspace-saved'));
 }catch(e){cloudLocked=true;cloudQueued=payload;cloudBanner('SAVE FAILED — '+e.message+'. Stop editing. Export a backup, then reload once your changes are secured. ');alert('Cloud save failed. Your changes are NOT saved to the shared database. '+e.message)}
 finally{cloudSaving=false;if(cloudQueued&&!cloudLocked)flushCloud()}
 }
