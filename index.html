@@ -338,6 +338,14 @@ let pending=false;function queue(){if(pending)return;pending=true;requestAnimati
 const observer=new MutationObserver(queue);
 function start(){clean();const app=document.getElementById('app');if(app)observer.observe(app,{childList:true,subtree:true,characterData:true})}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+})();</script><script id="pfp-home-order-v57">(function(){'use strict';
+let active=false;
+function arrange(){const app=document.getElementById('app');if(!app)return;const title=app.querySelector('.p7-top'),overview=app.querySelector('.p7x-mixed');if(!title||!overview)return;
+if(app.firstElementChild!==title)app.prepend(title);
+if(title.nextElementSibling!==overview)title.insertAdjacentElement('afterend',overview);
+}
+function start(){const app=document.getElementById('app');if(!app)return;const observer=new MutationObserver(()=>{if(active)return;active=true;observer.disconnect();try{arrange()}finally{observer.observe(app,{childList:true,subtree:true});active=false}});arrange();observer.observe(app,{childList:true,subtree:true})}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();</script></body></html>');w.document.close();w.focus();setTimeout(()=>w.print(),350)}
 function locationInsights(){const arr=db.items.locations;let byStatus=defs.locations.statuses.map(t=>[t,arr.filter(x=>x.status===t).length]);let byGovern=[...new Set(arr.map(x=>x.governorate).filter(Boolean))].sort().map(g=>[g,arr.filter(x=>x.governorate===g).length]);let c=el('div',{class:'chartgrid'});c.append(chartPanel(t('Location status','حالة المواقع'),barchart(byStatus)),chartPanel(t('Offices by governorate','المكاتب حسب المحافظة'),barchart(byGovern)));$('app').append(c);
  let riskRows=arr.map(x=>({...x,score:(+x.likelihood||0)*(+x.impact||0)})).sort((a,b)=>b.score-a.score);let pane=el('section',{class:'panel'});pane.innerHTML='<h2>'+t('Location comparison & risk register','مقارنة المواقع وسجل المخاطر')+'</h2><p class="muted">'+t('Compare operational readiness, monthly cost, office capacity, and assessed risk. Scores are human-entered estimates, not automatic security predictions.','قارن الجاهزية والتكلفة والسعة والمخاطر. التقديرات مُدخلة من الموظفين وليست تنبؤات أمنية.')+'</p><div class="scroll"><table><thead><tr>'+['Office','Governorate','Capacity','Cost (ILS/mo)','Risk /25','Status','Report'].map((v,i)=>'<th>'+t(v,['المكتب','المحافظة','السعة','التكلفة (شيكل/شهر)','الخطورة /٢٥','الحالة','التقرير'][i])+'</th>').join('')+'</tr></thead><tbody>'+riskRows.map(x=>'<tr><td>'+esc(x.name)+'</td><td>'+esc(x.governorate||'—')+'</td><td>'+esc(x.capacity||'—')+'</td><td>'+esc(x.monthlyCost||'—')+'</td><td><strong>'+x.score+'/25</strong></td><td>'+esc(x.status||'—')+'</td><td><button class="mini" data-report="'+esc(x.id)+'">'+t('Print','طباعة')+'</button></td></tr>').join('')+'</tbody></table></div>';$('app').append(pane);
