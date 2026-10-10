@@ -1264,64 +1264,11 @@ function stripStrayStyles(){const host=document.querySelector('#app');if(!host)r
 function refresh(){stripStrayStyles();if(typeof window.__pfpRefreshCharts==='function')window.__pfpRefreshCharts()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',refresh);else refresh();
 document.addEventListener('click',e=>{if(e.target.closest?.('[data-p7goto="home"],[data-goto="home"],[data-page="home"]'))requestAnimationFrame(refresh)},true);
-})();</script><script id="pfp-future-graphs-v54">(function(){
-'use strict';
-const labels={tasks:['To Do','In Progress','Done','Blocked'],approvals:['Pending','Approved','Rejected','Changes']};
-const E=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function graph(kind,vals){
- const names=labels[kind],W=500,H=210,n=4,x=i=>49+i*133;
- let base='<svg viewBox="0 0 500 210" role="img" aria-label="'+(kind==='tasks'?'Task status live flow':'Approval workflow live flow')+'"><defs><linearGradient id="pfp54beam'+kind+'" x1="0" y1="1" x2="0" y2="0"><stop stop-color="#0082e7" stop-opacity=".1"/><stop offset=".65" stop-color="#1bc8ff" stop-opacity=".6"/><stop offset="1" stop-color="#ffe5aa"/></linearGradient><filter id="pfp54glow'+kind+'"><feGaussianBlur stdDeviation="3"/></filter></defs>';
- for(let j=0;j<5;j++)base+='<path d="M20 '+(25+j*36)+'H480" stroke="#2d77a9" stroke-opacity=".22"/>';
- const max=Math.max(1,...vals),y=i=>148-70*vals[i]/max;
- if(kind==='tasks'){
- const path=vals.map((v,i)=>(i?'L':'M')+x(i)+' '+y(i)).join(' ');
- base+='<path d="'+path+'" fill="none" stroke="#0aa5ff" stroke-width="11" opacity=".3" filter="url(#pfp54glowtasks)"/><path d="'+path+'" fill="none" stroke="#22cfff" stroke-width="3" class="pfp54-flow"/>';
- for(let i=0;i<n;i++)base+='<path d="M'+x(i)+' 160V'+y(i)+'" stroke="url(#pfp54beamtasks)" stroke-width="6"/><ellipse cx="'+x(i)+'" cy="164" rx="32" ry="9" fill="none" stroke="'+(i===2?'#ffd780':'#26c6ff')+'" stroke-width="2"/><circle class="pfp54-pulse" cx="'+x(i)+'" cy="'+y(i)+'" r="8" fill="#f9d990"/><text x="'+x(i)+'" y="'+(y(i)-16)+'" text-anchor="middle" fill="#ffe0a0" font-size="17" font-weight="bold">'+vals[i]+'</text>';
- }else{
- for(let i=0;i<n-1;i++){const a=x(i),b=x(i+1);base+='<path class="pfp54-flow" d="M'+a+' 115 Q'+((a+b)/2)+' 58 '+b+' 115" stroke="#15bfff" fill="none" stroke-width="3"/><path d="M'+(b-20)+' 107 l10 8 -10 8" fill="none" stroke="#facb73" stroke-width="2"/>';}
- for(let i=0;i<n;i++)base+='<ellipse cx="'+x(i)+'" cy="157" rx="33" ry="11" fill="none" stroke="#24bcff" stroke-width="2"/><circle class="pfp54-pulse" cx="'+x(i)+'" cy="154" r="11" fill="#0b95e7" opacity=".65"/><rect x="'+(x(i)-16)+'" y="87" width="32" height="39" rx="4" stroke="'+(i?'#26c7ff':'#f5c970')+'" fill="#153959"/><path d="M'+(x(i)-9)+' 98h18m-18 7h18m-18 7h12" stroke="#8adeff" stroke-width="2"/><text x="'+x(i)+'" y="73" text-anchor="middle" fill="#ffe0a0" font-size="18" font-weight="bold">'+vals[i]+'</text>';
- }
- for(let i=0;i<n;i++)base+='<text x="'+x(i)+'" y="193" text-anchor="middle" fill="#b7def8" font-size="12">'+E(names[i])+'</text>';
- return base+'</svg>';
-}
-function upgrade(){
- const root=document.getElementById('pfpv-grid');if(!root)return;
- for(const kind of ['tasks','approvals']){
- const card=root.querySelector('[data-pfpv-kind="'+kind+'"]');if(!card||card.querySelector('.pfp54-graph'))continue;
- const columns=[...card.querySelectorAll('.pfpv-live-column')];
- if(columns.length!==4)continue; // Keep other chart modes unchanged.
- const vals=columns.map(c=>Math.max(0,parseInt(c.querySelector('.pfpv-value')?.textContent,10)||0));
- const plot=card.querySelector('.pfpv-live-bars');if(!plot)continue;
- const total=vals.reduce((a,b)=>a+b,0);
- const chips=document.createElement('div');chips.className='pfp54-metrics';chips.innerHTML=(kind==='tasks'?['To Do','In Progress','Done','Blocked']:['Pending','Approved','Rejected','Changes']).map((name,i)=>'<span><b>'+vals[i]+'</b>'+E(name)+'</span>').join('');
- const panel=document.createElement('div');panel.className='pfp54-graph';panel.innerHTML=graph(kind,vals);
- const legend=document.createElement('div');legend.className='pfp54-legend';legend.innerHTML='<span>Recorded '+(kind==='tasks'?'tasks':'decisions')+': '+total+'</span><span>Animated flow (illustrative)</span>';
- plot.replaceWith(panel);panel.before(chips);panel.after(legend);
- }
-}
-let queued=false;const observer=new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;upgrade()})});
-function init(){const root=document.getElementById('pfpv-grid');if(!root){setTimeout(init,600);return}observer.observe(root,{childList:true,subtree:false});upgrade();}
+})();</script><script id="pfp-safe-home-layout-v59">(function(){'use strict';
+var observer,busy=false;
+function arrange(){var app=document.getElementById('app');if(!app)return;var top=app.querySelector('.p7-top'),over=app.querySelector('.p7x-mixed');if(top&&over){if(app.firstElementChild!==top)app.insertBefore(top,app.firstChild);if(top.nextElementSibling!==over)top.insertAdjacentElement('afterend',over)}
+var walker=document.createTreeWalker(app,NodeFilter.SHOW_TEXT),bad=[];while(walker.nextNode()){var n=walker.currentNode,p=n.parentElement;if(p&&!p.closest('script,style,pre,code,textarea')){var v=(n.nodeValue||'').trim();if(v.startsWith('#app .brain47{')&&v.includes('@keyframes brain47Pulse')&&v.length>400)bad.push(n)}}bad.forEach(function(n){n.remove()})}
+function run(){if(busy)return;busy=true;if(observer)observer.disconnect();try{arrange()}finally{if(observer)observer.observe(document.getElementById('app'),{childList:true,subtree:true});busy=false}}
+function init(){var app=document.getElementById('app');if(!app)return;observer=new MutationObserver(run);run()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
-})();</script><script id="pfp-stray-css-cleaner-v56">(function(){'use strict';
-function clean(){
- const app=document.getElementById('app');if(!app)return;
- const walker=document.createTreeWalker(app,NodeFilter.SHOW_TEXT);
- const targets=[];while(walker.nextNode()){const n=walker.currentNode,p=n.parentElement;if(!p||p.closest('style,script,textarea,pre,code'))continue;
- const v=(n.nodeValue||'').trim();
- if(v.startsWith('#app .brain47{')&&v.includes('.brain47-grid')&&v.length>300)targets.push(n);
- }
- targets.forEach(n=>n.remove());
-}
-let pending=false;function queue(){if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;clean()})}
-const observer=new MutationObserver(queue);
-function start(){clean();const app=document.getElementById('app');if(app)observer.observe(app,{childList:true,subtree:true,characterData:true})}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
-})();</script><script id="pfp-home-order-v57">(function(){'use strict';
-let active=false;
-function arrange(){const app=document.getElementById('app');if(!app)return;const title=app.querySelector('.p7-top'),overview=app.querySelector('.p7x-mixed');if(!title||!overview)return;
-if(app.firstElementChild!==title)app.prepend(title);
-if(title.nextElementSibling!==overview)title.insertAdjacentElement('afterend',overview);
-}
-function start(){const app=document.getElementById('app');if(!app)return;const observer=new MutationObserver(()=>{if(active)return;active=true;observer.disconnect();try{arrange()}finally{observer.observe(app,{childList:true,subtree:true});active=false}});arrange();observer.observe(app,{childList:true,subtree:true})}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();</script></body></html>
