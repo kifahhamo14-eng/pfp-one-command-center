@@ -454,14 +454,24 @@ if(p.data.account_status==='pending'){msg.textContent='Your request is pending a
 if(launched)return true;
 try{await fetchCloud()}catch(e){msg.textContent=e.message;return false}
 if(!window.__pfpSharedData){
- const legacyKey='pfp_campaign_hq_v1';
- // Legacy browser backups remain untouched. Import deliberately only through a separate action.
+ const legacyKey='palestine_campaign_hq_v1';
+ let backup=null;
+ try{backup=JSON.parse(localStorage.getItem(legacyKey)||'null')}catch(_){}
+ if(backup?.items&&Object.values(backup.items).some(v=>Array.isArray(v)&&v.length)){
+   if(confirm('Local PFP ONE records were found on this device. The shared cloud workspace is empty. Import these records into PFP Supabase now? Your local backup will remain unchanged.')){
+     const upload=await client.rpc('pfp_save_workspace',{p_revision:cloudRevision,p_data:backup});
+     if(upload.error){msg.textContent='Cloud import failed: '+upload.error.message;return false}
+     cloudRevision=Number(upload.data);
+     window.__pfpSharedData=backup;
+   }
+ }
 }
 launched=true;
 try{
 const script=document.createElement('script');script.textContent=document.getElementById('pfpDashboardSource').textContent;document.body.appendChild(script);
 const role=document.getElementById('role');if(role){role.value='director';role.disabled=true;role.title='Administrator access is controlled by Supabase'}
 document.body.classList.add('pfp-authed');cloudBanner('PFP ONE shared workspace connected · Revision '+cloudRevision+'. ');
+setInterval(async()=>{if(cloudLocked||cloudSaving||cloudQueued)return;try{const v=await client.from('pfp_command_workspace').select('revision').eq('id','main').single();if(v.data&&Number(v.data.revision)!==cloudRevision){cloudLocked=true;cloudBanner('PFP ONE cloud has newer changes from another device. Please refresh this page before editing. ');}}catch(_){}},25000);
 }catch(err){launched=false;msg.textContent='Dashboard startup error: '+err.message;}
 return launched;
 }
