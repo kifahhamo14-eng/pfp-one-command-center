@@ -453,6 +453,10 @@ if(p.error){msg.textContent='Unable to load your employee profile: '+p.error.mes
 if(p.data.account_status==='pending'){msg.textContent='Your request is pending administrator approval.';return false}if(p.data.account_status!=='active'){msg.textContent='Your account is not active. Contact your administrator.';return false}currentUser=u.data.user;currentProfile=p.data;if(p.data.role!=='super_admin'){document.body.classList.add('pfp-employee');document.getElementById('pfpEmployeeHome').style.display='block';return true}
 if(launched)return true;
 try{await fetchCloud()}catch(e){msg.textContent=e.message;return false}
+if(!window.__pfpSharedData){
+ const legacyKey='pfp_campaign_hq_v1';
+ // Legacy browser backups remain untouched. Import deliberately only through a separate action.
+}
 launched=true;
 try{
 const script=document.createElement('script');script.textContent=document.getElementById('pfpDashboardSource').textContent;document.body.appendChild(script);
