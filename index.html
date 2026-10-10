@@ -1292,4 +1292,17 @@ var walker=document.createTreeWalker(app,NodeFilter.SHOW_TEXT),bad=[];while(walk
 function run(){if(busy)return;busy=true;if(observer)observer.disconnect();try{arrange()}finally{if(observer)observer.observe(document.getElementById('app'),{childList:true,subtree:true});busy=false}}
 function init(){var app=document.getElementById('app');if(!app)return;observer=new MutationObserver(run);run()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();</script><script id="pfp-css-visibility-fix-v61">(function(){'use strict';
+const start='#app .brain47{',end='@media(prefers-reduced-motion:reduce)';
+function cleanup(){
+ const root=document.body;if(!root)return;const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),matches=[];
+ while(walker.nextNode()){const n=walker.currentNode,p=n.parentElement;if(!p||p.closest('script,style,textarea,pre,code'))continue;
+ const text=n.nodeValue||'',i=text.indexOf(start);
+ if(i>=0&&text.slice(i).includes('.brain47-grid')&&text.slice(i).includes(end)){matches.push({node:n,index:i});}
+ }
+ matches.forEach(({node,index})=>{const val=node.nodeValue;let after=val.slice(index);const close=after.indexOf('}');if(index===0){node.remove()}else{node.nodeValue=val.slice(0,index)}});
+}
+let queued=false;const observer=new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;observer.disconnect();cleanup();observer.observe(document.body,{childList:true,subtree:true,characterData:true})})});
+function init(){cleanup();observer.observe(document.body,{childList:true,subtree:true,characterData:true})}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();</script></body></html>
