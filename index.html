@@ -695,7 +695,7 @@ p8BridgeLegacy();
 p7Elections=p8Render;
 
 const p7OldRender=render;
-render=function(){if(page==='home'||page==='candidates'){document.documentElement.dir=language==='ar'?'rtl':'ltr';$('langBtn').textContent=language==='ar'?'English':'العربية';renderNav();if(page==='home')p7Home();else p7Elections()}else p7OldRender()};
+render=function(){if(page==='home'||page==='candidates'){document.documentElement.dir=language==='ar'?'rtl':'ltr';$('langBtn').textContent=language==='ar'?'English':'العربية';renderNav();if(page==='home')home();else p7Elections()}else p7OldRender()};
 home=function(){p7Home();window.__pfpEnsureBrain?.();};
 
 render();
