@@ -696,7 +696,7 @@ p7Elections=p8Render;
 
 const p7OldRender=render;
 render=function(){if(page==='home'||page==='candidates'){document.documentElement.dir=language==='ar'?'rtl':'ltr';$('langBtn').textContent=language==='ar'?'English':'العربية';renderNav();if(page==='home')home();else p7Elections()}else p7OldRender()};
-home=function(){p7Home();window.__pfpEnsureBrain?.();};
+home=function(){p7Home();const overview=document.querySelector('#app .p7x-mixed'),brain=document.querySelector('#pfpbrain-v47');if(overview&&brain)overview.insertAdjacentElement('afterend',brain);window.__pfpEnsureBrain?.();};
 
 render();
 
@@ -1125,7 +1125,7 @@ function layer(){
  let root=q('#pfpv-command');
  if(root)return;
  root=document.createElement('section');root.className='pfpv-layer';root.id='pfpv-command';
- app.prepend(root);
+ const overview=app.querySelector('.p7x-mixed'),brain=app.querySelector('#pfpbrain-v47');if(brain)brain.insertAdjacentElement('afterend',root);else if(overview)overview.insertAdjacentElement('afterend',root);else app.append(root);
  root.innerHTML='<svg class="pfpv-stream" viewBox="0 0 900 350" preserveAspectRatio="none"><path d="M-20 270 Q300 5 570 180 T930 45"/><path d="M-20 100 Q250 350 520 70 T930 220"/></svg><div class="pfpv-head"><div><div class="pfpv-eyebrow">PFP ONE · LIVING INTELLIGENCE</div><h2>Visual Command Layer</h2><small style="color:#c0d2e9">Live from this dashboard’s available records, with guided drill-downs</small></div><div class="pfpv-controls"><button data-pfpv-chart="bar" class="pfpv-active">3D Bars</button><button data-pfpv-chart="donut">Donuts</button><button data-pfpv-chart="trend">Trends</button><button data-pfpv-action="compare">Compare</button><button data-pfpv-action="expand">⤢ Expand</button></div></div><div id="pfpv-grid" class="pfpv-grid"></div><div class="pfpv-modes">Motion <select id="pfpv-motion"><option value="minimal">Minimal</option><option value="executive">Executive</option><option value="command">Command Center</option></select><span id="pfpv-motion-label">Smooth animations and subtle visual highlighting</span></div><div class="pfpv-footnote">Counts come from the currently loaded PFP ONE workspace. Activity logs and employee accounts may have separate audit coverage; no simulated productivity ratings are used. Motion indicates presentation, not new data unless a count actually changes.</div>';
  const sel=q('#pfpv-motion',root);try{motion=localStorage.getItem('pfp_viz_motion')||'executive'}catch{}sel.value=motion;sel.onchange=()=>{motion=sel.value;try{localStorage.setItem('pfp_viz_motion',motion)}catch{}applyMotion();};
  root.addEventListener('click',ev=>{const b=ev.target.closest('button');if(!b)return;if(b.dataset.pfpvChart){view=b.dataset.pfpvChart;root.querySelectorAll('[data-pfpv-chart]').forEach(x=>x.classList.toggle('pfpv-active',x===b));paint()}else if(b.dataset.pfpvAction==='expand'){isExpanded=!isExpanded;root.classList.toggle('pfpv-detailed',isExpanded);b.textContent=isExpanded?'⊟ Collapse':'⤢ Expand';}else if(b.dataset.pfpvAction==='compare')inspect('comparison');else if(b.dataset.pfpvDetail){inspect(b.dataset.pfpvDetail)}else if(b.dataset.pfpvRecord){inspect('person',b.dataset.pfpvRecord)}});
