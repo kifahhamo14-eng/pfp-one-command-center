@@ -950,7 +950,7 @@ p8BridgeLegacy();
 p7Elections=p8Render;
 
 const p7OldRender=render;
-render=function(){if(page==='home'||page==='candidates'){document.documentElement.dir=language==='ar'?'rtl':'ltr';$('langBtn').textContent=language==='ar'?'English':'العربية';renderNav();if(page==='home')home();else p7Elections()}else p7OldRender()};
+render=function(){document.body.dataset.pfpPage=page;if(page==='home'||page==='candidates'){document.documentElement.dir=language==='ar'?'rtl':'ltr';$('langBtn').textContent=language==='ar'?'English':'العربية';renderNav();if(page==='home')home();else p7Elections()}else p7OldRender()};
 home=function(){p7Home();const overview=document.querySelector('#app .p7x-mixed'),brain=document.querySelector('#pfpbrain-v47');if(overview&&brain)overview.insertAdjacentElement('afterend',brain);window.__pfpEnsureBrain?.();window.__pfpRefreshCharts?.();};
 
 
@@ -1612,7 +1612,7 @@ document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.tar
 })();</script><script id="pfpbrain-runtime-v47">(function(){
 const nodes=[['tasks','Tasks',20,20],['candidates','Candidates',50,12],['risks','Risks',80,20],['finance','Finance',18,75],['approvals','Approvals',80,75],['team','Team',50,87],['home','PFP ONE',50,48]];
 function add(){
-const app=document.querySelector('#app');if(!app||!app.children.length||document.querySelector('#pfpbrain-v47'))return;
+const app=document.querySelector('#app');if(!app||document.body.dataset.pfpPage!=='home'||!app.children.length||document.querySelector('#pfpbrain-v47'))return;
 const el=document.createElement('section');el.id='pfpbrain-v47';el.className='brain47';
 const paths=nodes.slice(0,6).map((n,i)=>{const x=n[2]*6,y=n[3]*3.3,mid=nodes[6],mx=mid[2]*6,my=mid[3]*3.3,path='M '+mx+' '+my+' Q '+((mx+x)/2)+' '+((my+y)/2-45)+' '+x+' '+y;return '<path d="'+path+'" fill="none" stroke="#74c9ee" stroke-opacity=".4" stroke-width="2"/>'+Array.from({length:3},(_,j)=>'<circle r="3" fill="#e9c783"><animateMotion path="'+path+'" dur="'+(3+i*.4)+'s" begin="-'+(j*1.1)+'s" repeatCount="indefinite"/></circle>').join('')}).join('');
 const icons=nodes.map((n,i)=>{const x=n[2]*6,y=n[3]*3.3;return '<g data-brain47="'+n[0]+'" tabindex="0" role="button" aria-label="Open '+n[1]+'"><circle class="brain47-ring" cx="'+x+'" cy="'+y+'" r="'+(i===6?34:24)+'"/><circle class="brain47-node" cx="'+x+'" cy="'+y+'" r="'+(i===6?27:17)+'"/><text x="'+x+'" y="'+(y+37)+'" font-size="13" fill="#f5f6fe" text-anchor="middle">'+n[1]+'</text></g>'}).join('');
