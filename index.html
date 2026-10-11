@@ -932,12 +932,26 @@ if(p.data.account_status==='pending'){msg.textContent='Your request is pending a
  const approvals=await client.from('pfp_access_requests').select('module,status,expires_at').eq('employee_id',currentUser.id).in('status',['approved_temporary','approved_permanent','approved_once']);
  if(approvals.error)throw approvals.error;
  for(const approval of approvals.data||[]){if(approval.expires_at&&Date.parse(approval.expires_at)<=Date.now())continue;const rule=window.__pfpEmployeeRules[approval.module];if(rule?.restricted&&rule.behavior==='request')window.__pfpEmployeeRules[approval.module]={...rule,restricted:false}}
- window.__pfpCommit=data=>{const changed=Object.fromEntries(Object.entries(data.items||{}).filter(([k,v])=>JSON.stringify(v)!==JSON.stringify(window.__pfpSharedData.items[k])));if(!Object.keys(changed).length)return;client.rpc('pfp_employee_workspace_save',{p_revision:cloudRevision,p_items:changed}).then(res=>{if(res.error){alert('Save failed: '+res.error.message+' Refresh before editing.');location.reload()}else{cloudRevision=Number(res.data);window.__pfpSharedData.items=JSON.parse(JSON.stringify(data.items));}})};
+ window.__pfpCommit=data=>{
+  if(cloudLocked)return false;
+  const changed=Object.fromEntries(Object.entries(data.items||{}).filter(([k,v])=>JSON.stringify(v)!==JSON.stringify(window.__pfpSharedData.items[k])));
+  if(!Object.keys(changed).length)return true;
+  if(cloudSaving){cloudBanner('Save already in progress. Wait for confirmation before further edits. ');return false;}
+  cloudSaving=true;cloudBanner('Saving employee changes to PFP ONE cloud… ');
+  client.rpc('pfp_employee_workspace_save',{p_revision:cloudRevision,p_items:changed}).then(res=>{
+   if(res.error)throw res.error;
+   cloudRevision=Number(res.data);
+   window.__pfpSharedData.items=JSON.parse(JSON.stringify(data.items));
+   cloudBanner('PFP ONE shared workspace · Cloud saved · Revision '+cloudRevision+'. ');
+   window.dispatchEvent(new Event('pfp:workspace-saved'));
+  }).catch(e=>{cloudLocked=true;cloudBanner('SAVE FAILED — '+e.message+'. Stop editing and contact your administrator. ');alert('Employee cloud save failed: '+e.message+' Your updates were not stored.');}).finally(()=>{cloudSaving=false});
+  return true;
+ };
  const script=document.createElement('script');script.textContent=document.getElementById('pfpDashboardSource').textContent;document.body.appendChild(script);
  document.body.classList.add('pfp-authed','pfp-employee-dashboard');launched=true;
  const role=document.getElementById('role');if(role){role.value='staff';role.disabled=true}
  const allowed=name=>{const rule=window.__pfpEmployeeRules[name];return !!rule&&(!rule.restricted||(rule.expires_at&&Date.parse(rule.expires_at)<=Date.now()))};
- const names={home:'Command Center',tasks:'Tasks',candidates:'Candidates',campaigns:'Candidates',finance:'Finance',funders:'Finance',team:'Employee Management',reports:'Reports'};
+ const names={home:'Command Center',national:'National Operations',departments:'National Departments',tasks:'Tasks',candidates:'Candidates',campaigns:'Candidates',finance:'Finance',funders:'Finance',team:'Employee Management',reports:'Reports'};
  document.querySelectorAll('#nav [data-page]').forEach(b=>{const name=names[b.dataset.page]||b.dataset.page;if(!allowed(name))b.remove()});
  const first=document.querySelector('#nav [data-page]');if(first){first.click()}else document.getElementById('app').textContent='No dashboard sections assigned. Request access from the employee access page.';
  const requestBtn=document.createElement('button');requestBtn.textContent='Request Access';requestBtn.className='btn';requestBtn.style='position:fixed;right:12px;bottom:16px;z-index:22';
