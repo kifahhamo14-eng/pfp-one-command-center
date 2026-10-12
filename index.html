@@ -1154,7 +1154,7 @@ function pfpUniversalAvatars(){
   const nodes=[];while(walk.nextNode()){
    const node=walk.currentNode,raw=node.textContent||'',parent=node.parentElement;
    if(!parent||raw.length>180||raw.length<5||!pairs.some(x=>raw.toLowerCase().includes(x.name.toLowerCase())))continue;
-   if(parent.closest('.pfp-employee-tag, .pfpsoc-activity-record, .pfpsoc-avatarwrap, .profileCard, .pfpsoc-modal-back, .profileForm, button, a, input, textarea, select, option, script, style, svg, noscript, [contenteditable], [data-no-avatar]'))continue;
+   if(parent.closest('.pfp-employee-tag, .pfpsoc-activity-record, .pfpsoc-avatarwrap, .profileCard, .pfp-lux-card, .pfpsoc-modal-back, .profileForm, button, a, input, textarea, select, option, script, style, svg, noscript, [contenteditable], [data-no-avatar]'))continue;
    nodes.push(node);
   }
   for(const node of nodes){
