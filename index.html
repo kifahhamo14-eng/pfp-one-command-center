@@ -1949,7 +1949,7 @@ else{schedule();new MutationObserver(schedule).observe(document.getElementById('
 window.addEventListener('pfp:workspace-change',()=>{if(document.getElementById('pfp-auto-risk-root'))draw()});
 setInterval(()=>{if(document.getElementById('pfp-auto-risk-root'))draw()},60000);
 })();
-<script id="pfp-lamp-login-script">
+</script><script id="pfp-lamp-login-script">
 (function(){
 const gate=document.getElementById('pfpAuthGate');if(!gate||document.getElementById('pfpLampStage')===null)return;
 const stage=document.getElementById('pfpLampStage'),svg=stage.querySelector('svg'),cord=document.getElementById('pfpLampCord'),hit=document.getElementById('pfpLampHit'),handle=document.getElementById('pfpLampHandle');
@@ -1963,4 +1963,4 @@ function up(e){if(!drag||e.pointerId!==pid)return;e.preventDefault();drag=false;
 hit.addEventListener('pointerdown',down);handle.addEventListener('pointerdown',down);stage.addEventListener('pointermove',move);stage.addEventListener('pointerup',up);stage.addEventListener('pointercancel',up);
 gate.classList.add('pfp-lamp-ready');draw();
 })();
-</script></script></body></html>
+</script></body></html>
