@@ -471,6 +471,11 @@ body:not(.pfp-authed) #pfpAuthGate.pfp-lamp-ready.pfp-lamp-on{background:radial-
 #pfpAuthGate.pfp-lamp-ready .authCard h1{font-family:Georgia,serif;font-size:clamp(30px,7vw,44px)!important;letter-spacing:.12em;text-align:center;text-shadow:0 2px 24px #e4b96444}
 #pfpAuthGate.pfp-lamp-ready .authCard h2{font-family:Georgia,serif;letter-spacing:.05em;text-align:center}
 #pfpAuthGate.pfp-lamp-ready .authCard input{background:#f7f2e9!important;border:1px solid #d2b679!important}
+/* iPhone/Safari PFP sign-in legibility and editing fix; scoped to PFP auth only */
+#pfpAuthGate #pfpLoginForm input,#pfpAuthGate #pfpSignupForm input{color:#17233b!important;-webkit-text-fill-color:#17233b!important;caret-color:#17233b!important;opacity:1!important;user-select:text!important;-webkit-user-select:text!important;pointer-events:auto!important;touch-action:manipulation!important;font-size:16px!important}
+#pfpAuthGate #pfpLoginForm input::placeholder,#pfpAuthGate #pfpSignupForm input::placeholder{color:#626b79!important;-webkit-text-fill-color:#626b79!important;opacity:1!important}
+#pfpAuthGate #pfpLoginForm input:focus,#pfpAuthGate #pfpSignupForm input:focus{outline:2px solid #c69b56!important;outline-offset:2px!important}
+#pfpAuthGate #pfpLoginForm input:-webkit-autofill,#pfpAuthGate #pfpSignupForm input:-webkit-autofill{-webkit-text-fill-color:#17233b!important;caret-color:#17233b!important}
 #pfpAuthGate.pfp-lamp-ready .authCard button{background:linear-gradient(120deg,#c69b56,#f4d79b,#b8873d)!important;box-shadow:0 4px 18px #b68a3b2b;transition:filter .2s,transform .2s}
 #pfpAuthGate.pfp-lamp-ready .authCard button:active{transform:scale(.98)}
 #pfpAuthGate .pfp-lamp-hint{top:231px;color:#d2b994;text-shadow:0 1px 6px black}
